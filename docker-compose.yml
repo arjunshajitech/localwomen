@@ -2,7 +2,9 @@ services:
   localwomen:
     build: .
     restart: always
-    ports:
-      - "127.0.0.1:3366:3000"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    # Host networking: "localhost" in requests means your machine, not the container.
+    # Bound to 127.0.0.1 so the proxy is not exposed to the network.
+    network_mode: host
+    environment:
+      HOST: 127.0.0.1
+      PORT: 3366

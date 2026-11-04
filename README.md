@@ -27,4 +27,4 @@ Without Docker: `make dev` (or `node server.js`) → http://localhost:3000
 
 ## Tip
 
-To call an API running on your own machine from Docker, use `http://host.docker.internal:<port>` instead of `localhost`.
+The container uses host networking, so `http://localhost:<port>` reaches APIs running on your machine. This needs Linux, or Docker Desktop 4.34+ with host networking turned on.
