@@ -1,0 +1,1097 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Localwomen</title>
+<script>
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('webman:theme'); } catch (e) {}
+    if (t !== 'light' && t !== 'dark') t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Edu+NSW+ACT+Cursive:wght@400..700&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* Theme tokens follow Hoppscotch's open-source theme (dark default + green accent). */
+  :root {
+    --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --fs: 15px;   /* base font size; changed by the A− / A+ buttons */
+    --font-size-body: var(--fs);
+    --font-size-tiny: calc(var(--fs) * .8);
+    --line-height-body: 1.45;
+    --font-size-code: calc(var(--fs) * .97);
+
+    --accent-color: #10b981; --accent-light-color: #34d399; --accent-dark-color: #059669; --accent-contrast-color: #ffffff;
+
+    --primary-color: #181818; --primary-light-color: #1c1c1e; --primary-dark-color: #262626; --primary-contrast-color: #171717;
+    --secondary-color: #a3a3a3; --secondary-light-color: #737373; --secondary-dark-color: #fafafa;
+    --divider-color: #1f1f1f; --divider-light-color: #1f1f1f; --divider-dark-color: #27272a;
+    --popover-color: #1b1b1b; --banner-error-color: #991b1b;
+
+    --method-get-color: #10b981; --method-post-color: #eab308; --method-put-color: #0ea5e9; --method-patch-color: #8b5cf6;
+    --method-delete-color: #f43f5e; --method-head-color: #14b8a6; --method-options-color: #6366f1;
+    --status-info-color: #3b82f6; --status-success-color: #22c55e; --status-redirect-color: #f59e0b;
+    --status-critical-error-color: #ef4444; --status-server-error-color: #f43f5e;
+
+    --j-key: #8b5cf6; --j-str: #10b981; --j-num: #f59e0b; --j-bool: #0ea5e9; --j-null: #f43f5e;
+    color-scheme: dark;
+  }
+  /* Light theme: chosen with the sun/moon button, or by the system when no choice is saved */
+  :root[data-theme=light] {
+      --primary-color: #ffffff; --primary-light-color: #f9fafb; --primary-dark-color: #f3f4f6; --primary-contrast-color: #fdfdfd;
+      --secondary-color: #6b7280; --secondary-light-color: #9ca3af; --secondary-dark-color: #111827;
+      --divider-color: #f3f4f6; --divider-light-color: #f3f4f6; --divider-dark-color: #d1d5db;
+      --popover-color: #ffffff; --banner-error-color: #fee2e2;
+      --method-get-color: #22c55e; --method-post-color: #f59e0b; --method-put-color: #3b82f6; --method-patch-color: #a855f7;
+      --method-delete-color: #ef4444; --method-head-color: #84cc16; --method-options-color: #ec4899;
+      --j-key: #7c3aed; --j-str: #059669; --j-num: #d97706; --j-bool: #0284c7; --j-null: #e11d48;
+      color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  * { scrollbar-width: thin; scrollbar-color: var(--divider-dark-color) transparent; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--primary-color); color: var(--secondary-color);
+    font-family: var(--font-sans); font-size: var(--font-size-body); line-height: var(--line-height-body);
+    -webkit-font-smoothing: antialiased; display: flex; flex-direction: column;
+  }
+  input, select, textarea, button { font: inherit; color: inherit; }
+  ::selection { background: color-mix(in srgb, var(--accent-color) 30%, transparent); }
+  svg.i { width: calc(var(--fs) * 1.15); height: calc(var(--fs) * 1.15); flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Header */
+  header { height: calc(var(--fs) * 3.5); flex: none; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-bottom: 1px solid var(--divider-color); }
+  .brand { font-family: 'Edu NSW ACT Cursive', cursive; font-weight: 500; font-size: calc(var(--fs) * 1.7); line-height: 1; color: var(--secondary-dark-color); white-space: nowrap; }
+  header .spacer { flex: 1; }
+  kbd { font-family: var(--font-sans); font-size: var(--font-size-tiny); background: var(--primary-dark-color); color: var(--secondary-light-color); border-radius: 4px; padding: 2px 6px; margin-left: 3px; }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: 4px; background: transparent; color: var(--secondary-color); padding: 6px 8px; cursor: pointer; font-weight: 600; white-space: nowrap; }
+  .btn:hover { color: var(--secondary-dark-color); background: var(--primary-dark-color); }
+  .btn.icon { padding: 6px; }
+  .btn-primary { background: var(--accent-color); color: var(--accent-contrast-color); padding: 0 20px; height: 100%; border-radius: 0 4px 4px 0; }
+  .btn-primary:hover { background: var(--accent-dark-color); color: var(--accent-contrast-color); }
+  .btn-primary:disabled { opacity: .75; cursor: wait; }
+
+  /* Request tabs bar */
+  .reqtabs { flex: none; display: flex; align-items: stretch; height: calc(var(--fs) * 3); background: var(--primary-light-color); border-bottom: 1px solid var(--divider-dark-color); }
+  .reqtabs-list { display: flex; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  .reqtabs-list::-webkit-scrollbar { display: none; }
+  .rtab {
+    position: relative; display: flex; align-items: center; gap: 8px; flex: none; width: calc(var(--fs) * 15); padding: 0 6px 0 14px; cursor: pointer; user-select: none;
+    color: var(--secondary-color); border-right: 1px solid var(--divider-dark-color); font-weight: 600;
+  }
+  .rtab:hover { background: var(--primary-dark-color); color: var(--secondary-dark-color); }
+  .rtab.active { background: var(--primary-color); color: var(--secondary-dark-color); }
+  .rtab.active::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--accent-color); }
+  .rtab.active::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: var(--primary-color); }
+  .rtab .m { font-size: var(--font-size-tiny); font-weight: 700; flex: none; }
+  .rtab .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rtab .x { flex: none; width: calc(var(--fs) * 1.6); height: calc(var(--fs) * 1.6); display: grid; place-items: center; border: 0; border-radius: 4px; background: none; color: var(--secondary-light-color); cursor: pointer; padding: 0; visibility: hidden; }
+  .rtab:hover .x, .rtab.active .x { visibility: visible; }
+  .rtab .x:hover { background: var(--divider-dark-color); color: var(--secondary-dark-color); }
+  .rtab .x svg { width: var(--fs); height: var(--fs); }
+  .rtab .spinner { width: calc(var(--fs) * .75); height: calc(var(--fs) * .75); border-width: 1.5px; color: var(--accent-color); flex: none; }
+  .reqtabs .add { flex: none; width: calc(var(--fs) * 3); display: grid; place-items: center; border: 0; background: none; color: var(--secondary-color); cursor: pointer; }
+  .reqtabs .add:hover { color: var(--secondary-dark-color); background: var(--primary-dark-color); }
+  .reqtabs .fill { flex: 1; }
+  .rtab:focus-visible, .reqtabs .add:focus-visible { outline: none; box-shadow: 0 0 0 1px var(--accent-color) inset; }
+
+  /* Cookie jar modal */
+  .modal { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .55); }
+  .modal-box { width: min(760px, 100%); max-height: min(80vh, 680px); display: flex; flex-direction: column; background: var(--popover-color); border: 1px solid var(--divider-dark-color); border-radius: 8px; box-shadow: 0 20px 60px rgba(0, 0, 0, .45); animation: dd-in .12s ease-out; }
+  .modal-head { display: flex; align-items: center; gap: 8px; padding: 12px 12px 12px 16px; border-bottom: 1px solid var(--divider-dark-color); }
+  .modal-head h2 { margin: 0; font-size: calc(var(--fs) * 1.15); font-weight: 700; color: var(--secondary-dark-color); flex: 1; }
+  .modal-sub { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--divider-color); flex-wrap: wrap; }
+  .modal-body { overflow: auto; min-height: 120px; }
+  .switch { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; color: var(--secondary-dark-color); }
+  .switch input { appearance: none; width: 28px; height: 16px; border-radius: 8px; background: var(--divider-dark-color); position: relative; cursor: pointer; margin: 0; transition: background .15s; }
+  .switch input::after { content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: #fff; transition: transform .15s; }
+  .switch input:checked { background: var(--accent-color); }
+  .switch input:checked::after { transform: translateX(12px); }
+  .jar-domain { padding: 8px 16px; font-weight: 700; color: var(--secondary-dark-color); background: var(--primary-light-color); border-bottom: 1px solid var(--divider-color); position: sticky; top: 0; }
+  table.jar { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  table.jar td { padding: 8px 16px; border-bottom: 1px solid var(--divider-color); vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  table.jar td.n { width: 24%; font-weight: 600; color: var(--secondary-dark-color); }
+  table.jar td.v { font-family: var(--font-mono); color: var(--secondary-color); }
+  table.jar td.a { width: 30%; color: var(--secondary-light-color); }
+  table.jar td.d { width: 44px; padding: 0 6px; text-align: center; }
+  table.jar td.d .btn:hover { color: var(--status-critical-error-color); }
+  .jar-note { padding: 0 16px 12px; color: var(--secondary-light-color); }
+  .jar-note b { color: var(--secondary-dark-color); font-weight: 600; }
+  .jar-note a { color: var(--accent-color); cursor: pointer; text-decoration: none; font-weight: 600; }
+
+  .fontctl { display: inline-flex; align-items: center; border: 1px solid var(--divider-dark-color); border-radius: 4px; }
+  .fontctl .btn { padding: 4px 8px; border-radius: 0; }
+  .fontctl span { min-width: 3.2em; text-align: center; color: var(--secondary-light-color); font-variant-numeric: tabular-nums; }
+  .resp-actions { margin-left: auto; display: flex; align-items: center; gap: 2px; }
+  .btn.done { color: var(--accent-color); }
+
+  main { flex: 1; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+
+  /* URL bar */
+  .request { display: flex; flex-direction: column; min-height: 0; max-height: 52vh; border-bottom: 1px solid var(--divider-dark-color); }
+  .urlbar { display: flex; padding: 16px 16px 12px; gap: 8px; flex: none; }
+  .urlfield { flex: 1; min-width: 0; display: flex; height: calc(var(--fs) * 3.1); border-radius: 4px; background: var(--primary-light-color); border: 1px solid var(--divider-dark-color); }
+  /* Custom dropdowns (native <select> stays hidden as the value holder) */
+  select.native { display: none; }
+  .dd-btn {
+    display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; border: 0; cursor: pointer; outline: none;
+    background: transparent; color: var(--secondary-dark-color); font-weight: 600; padding: 6px 8px; border-radius: 4px; white-space: nowrap;
+  }
+  .dd-btn:hover, .dd-btn[aria-expanded=true] { background: var(--primary-dark-color); }
+  .dd-btn:focus-visible { box-shadow: 0 0 0 1px var(--accent-color) inset; }
+  .dd-btn .chev { width: var(--fs); height: var(--fs); opacity: .7; transition: transform .15s; }
+  .dd-btn[aria-expanded=true] .chev { transform: rotate(180deg); }
+  .urlfield .dd-btn { width: calc(var(--fs) * 8.4); height: 100%; padding: 0 10px 0 14px; font-weight: 700; background: var(--primary-dark-color); border-radius: 4px 0 0 4px; }
+  .urlfield .dd-btn:hover, .urlfield .dd-btn[aria-expanded=true] { background: var(--divider-dark-color); }
+  .dd-menu {
+    position: fixed; z-index: 50; min-width: 160px; max-height: 60vh; overflow: auto; padding: 4px;
+    background: var(--popover-color); border: 1px solid var(--divider-dark-color); border-radius: 6px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .35), 0 2px 6px rgba(0, 0, 0, .2);
+    animation: dd-in .12s ease-out;
+  }
+  .dd-menu[hidden] { display: none; }
+  @keyframes dd-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .dd-item {
+    display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: transparent; cursor: pointer; outline: none; text-align: left;
+    padding: 8px 10px; border-radius: 4px; font-weight: 600; color: var(--secondary-color);
+  }
+  .dd-item:hover, .dd-item.hl { background: var(--primary-dark-color); color: var(--secondary-dark-color); }
+  .dd-item .tick { width: var(--fs); height: var(--fs); margin-left: auto; color: var(--accent-color); visibility: hidden; }
+  .dd-item[aria-selected=true] .tick { visibility: visible; }
+  .dd-item[data-m] { font-weight: 700; }
+  :root[data-theme=light] .dd-menu { box-shadow: 0 10px 30px rgba(0, 0, 0, .12), 0 2px 6px rgba(0, 0, 0, .06); }
+  #theme-btn .sun, :root[data-theme=light] #theme-btn .moon { display: none; }
+  :root[data-theme=light] #theme-btn .sun { display: block; }
+  .urlfield input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; padding: 0 12px; color: var(--secondary-dark-color); font-weight: 500; }
+  .urlfield input::placeholder { color: var(--secondary-light-color); }
+  [data-m=GET] { color: var(--method-get-color); } [data-m=POST] { color: var(--method-post-color); }
+  [data-m=PUT] { color: var(--method-put-color); } [data-m=PATCH] { color: var(--method-patch-color); }
+  [data-m=DELETE] { color: var(--method-delete-color); } [data-m=HEAD] { color: var(--method-head-color); }
+  [data-m=OPTIONS] { color: var(--method-options-color); }
+
+  /* Tabs */
+  .tabs { display: flex; padding: 0 16px; gap: 0; border-bottom: 1px solid var(--divider-color); overflow-x: auto; flex: none; scrollbar-width: none; }
+  .tab { position: relative; border: 0; background: none; padding: 10px 12px; cursor: pointer; font-weight: 600; color: var(--secondary-color); white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; }
+  .tab:hover { color: var(--secondary-dark-color); }
+  .tab.active { color: var(--secondary-dark-color); }
+  .tab.active::after { content: ''; position: absolute; left: 12px; right: 12px; bottom: 0; height: 2px; background: var(--accent-color); border-radius: 2px 2px 0 0; }
+  .badge { font-size: var(--font-size-tiny); line-height: 1; padding: 2px 5px; border-radius: 3px; background: var(--primary-dark-color); color: var(--secondary-color); }
+  .badge:empty { display: none; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-color); display: none; }
+  .dot.on { display: inline-block; }
+
+  .panes { min-height: 0; overflow: auto; }
+  .pane { display: none; }
+  .pane.active { display: block; }
+
+  /* Section toolbar (like "Query Parameters  … actions") */
+  .bar { display: flex; align-items: center; gap: 4px; height: calc(var(--fs) * 3); padding: 0 8px 0 16px; border-bottom: 1px solid var(--divider-color); position: sticky; top: 0; background: var(--primary-color); z-index: 1; }
+  .bar .label { font-weight: 600; color: var(--secondary-light-color); }
+  .bar .spacer { flex: 1; }
+
+  /* Key / value grid */
+  .kv { width: 100%; border-collapse: collapse; }
+  .kv tr { border-bottom: 1px solid var(--divider-color); }
+  .kv td { padding: 0; border-right: 1px solid var(--divider-color); }
+  .kv td:last-child, .kv td.tog { border-right: 0; }
+  .kv td.tog, .kv td.del { width: 36px; text-align: center; }
+  .kv input { width: 100%; border: 0; background: transparent; outline: none; padding: 9px 16px; color: var(--secondary-dark-color); font-weight: 500; }
+  .kv input::placeholder { color: var(--secondary-light-color); font-weight: 400; }
+  .kv tr.off input { opacity: .5; }
+  .kv .tog .btn { color: var(--accent-color); }
+  .kv tr.off .tog .btn { color: var(--secondary-light-color); }
+  .kv .del .btn:hover { color: var(--status-critical-error-color); }
+  .kv tr.blank .tog .btn, .kv tr.blank .del .btn { visibility: hidden; }
+
+  /* Auth */
+  .form { padding: 16px; display: grid; gap: 8px; max-width: 640px; }
+  .form label { font-weight: 600; color: var(--secondary-light-color); }
+  .textbox { width: 100%; border: 1px solid var(--divider-dark-color); background: var(--primary-light-color); border-radius: 4px; padding: 9px 12px; outline: none; color: var(--secondary-dark-color); font-family: var(--font-mono); }
+  .textbox:focus { border-color: var(--accent-color); }
+  .note { color: var(--secondary-light-color); padding: 10px 16px; }
+  .note code, .form code { font-family: var(--font-mono); color: var(--secondary-color); }
+
+  /* Body editor */
+  .editor { display: flex; font-family: var(--font-mono); font-size: var(--font-size-code); line-height: 1.6; }
+  .gutter { flex: none; padding: 8px 10px 8px 16px; text-align: right; color: var(--secondary-light-color); user-select: none; white-space: pre; opacity: .7; }
+  /* Highlighted editor: a coloured <pre> sits under a textarea whose text is transparent (the caret stays visible). */
+  .code-wrap { position: relative; flex: 1; min-width: 0; display: flex; }
+  .code-wrap pre.hl, .editor textarea { margin: 0; padding: 8px 12px; font: inherit; line-height: inherit; tab-size: 2; white-space: pre; letter-spacing: normal; word-spacing: normal; }
+  .code-wrap pre.hl { position: absolute; inset: 0; overflow: hidden; pointer-events: none; color: var(--secondary-dark-color); }
+  .editor textarea { position: relative; flex: 1; min-height: 200px; border: 0; outline: none; resize: vertical; background: transparent; color: var(--secondary-dark-color); overflow: auto; }
+  .editor textarea.colored { color: transparent; caret-color: var(--secondary-dark-color); }
+  .editor textarea::placeholder { color: var(--secondary-light-color); }
+  .editor textarea::selection { color: transparent; background: color-mix(in srgb, var(--accent-color) 30%, transparent); }
+  .editor textarea:disabled { opacity: .4; }
+  .editor textarea:disabled + pre.hl, .code-wrap:has(textarea:disabled) pre.hl { opacity: .4; }
+  .msg { color: var(--secondary-light-color); }
+  .msg.err { color: var(--status-critical-error-color); }
+  .msg.ok { color: var(--accent-color); }
+
+  /* Response */
+  .response { display: flex; flex-direction: column; min-height: 0; }
+  .status { display: flex; align-items: center; gap: 16px; padding: 0 16px; min-height: calc(var(--fs) * 3.2); flex: none; border-bottom: 1px solid var(--divider-color); font-weight: 600; flex-wrap: wrap; }
+  .status:empty { display: none; }
+  .status .k { color: var(--secondary-light-color); font-weight: 500; margin-right: 4px; }
+  .s1 { color: var(--status-info-color); } .s2 { color: var(--status-success-color); } .s3 { color: var(--status-redirect-color); }
+  .s4 { color: var(--status-critical-error-color); } .s5, .serr { color: var(--status-server-error-color); }
+  .response .panes { flex: 1; }
+  pre.out { margin: 0; padding: 12px 16px; font-family: var(--font-mono); font-size: var(--font-size-code); line-height: 1.6; color: var(--secondary-dark-color); white-space: pre-wrap; word-break: break-word; }
+  .j-key { color: var(--j-key); } .j-str { color: var(--j-str); } .j-num { color: var(--j-num); } .j-bool { color: var(--j-bool); } .j-null { color: var(--j-null); }
+  table.list { width: 100%; border-collapse: collapse; }
+  table.list td { padding: 9px 16px; border-bottom: 1px solid var(--divider-color); vertical-align: top; word-break: break-all; color: var(--secondary-dark-color); font-weight: 500; }
+  table.list td:first-child { width: 30%; color: var(--secondary-color); border-right: 1px solid var(--divider-color); }
+  .error-box { margin: 16px; padding: 12px 16px; border-radius: 4px; background: color-mix(in srgb, var(--status-critical-error-color) 12%, transparent); color: var(--status-critical-error-color); font-family: var(--font-mono); white-space: pre-wrap; }
+
+  .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 48px 16px; color: var(--secondary-light-color); text-align: center; }
+  .empty .big { width: calc(var(--fs) * 3.5); height: calc(var(--fs) * 3.5); opacity: .5; stroke-width: 1.4; }
+  .shortcuts { display: grid; grid-template-columns: auto auto; gap: 10px 24px; align-items: center; }
+  .shortcuts span:nth-child(odd) { text-align: right; }
+  .shortcuts span:nth-child(even) { text-align: left; }
+
+  .spinner { width: var(--fs); height: var(--fs); border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 640px) {
+    header { padding: 0 12px; } header .hint { display: none; }
+    .urlbar { padding: 12px; }
+    .urlfield { height: auto; flex-wrap: wrap; }
+    .urlfield .dd-btn { height: 38px; border-radius: 4px 0 0 0; flex: 1; width: auto; }
+    .urlfield .btn-primary { height: 38px; border-radius: 0 4px 0 0; }
+    .urlfield input { order: 3; flex-basis: 100%; height: calc(var(--fs) * 3); border-top: 1px solid var(--divider-dark-color); }
+    .tabs { padding: 0 4px; }
+    .kv input { padding: 9px 10px; }
+    .rtab { width: calc(var(--fs) * 11); }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    Localwomen
+  </div>
+  <span class="spacer"></span>
+  <div class="fontctl" title="Text size">
+    <button class="btn" id="font-dec" aria-label="Smaller text">A−</button>
+    <span id="font-size">15px</span>
+    <button class="btn" id="font-inc" aria-label="Larger text">A+</button>
+  </div>
+  <button class="btn icon" id="theme-btn" title="Toggle dark mode" aria-label="Toggle dark mode">
+    <svg class="i moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    <svg class="i sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  </button>
+  <button class="btn" id="jarbtn" title="Cookies saved from responses, shared by all tabs"><svg class="i" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9.5-9 3 3 0 0 0 3.5 3.5 3 3 0 0 0 3 3 3 3 0 0 0 3 2.5z"/><path d="M8.5 9.5h.01M12 15h.01M15.5 12.5h.01M8 14.5h.01"/></svg> Cookie jar <span class="badge" id="jarcount"></span></button>
+  <span class="hint">Send <kbd>Ctrl</kbd><kbd>↵</kbd></span>
+</header>
+
+<div class="reqtabs">
+  <div class="reqtabs-list" id="reqtabs" role="tablist" aria-label="Requests"></div>
+  <button class="add" id="addtab" title="New request tab" aria-label="New request tab"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+  <div class="fill" id="tabfill" title="Double-click for a new tab"></div>
+</div>
+
+<main>
+  <section class="request">
+    <div class="urlbar">
+      <div class="urlfield">
+        <select id="method" class="native" aria-label="Method">
+          <option>GET</option><option>POST</option><option>PUT</option><option>PATCH</option>
+          <option>DELETE</option><option>HEAD</option><option>OPTIONS</option>
+        </select>
+        <input id="url" type="text" placeholder="https://api.example.com/users?page=1" spellcheck="false" autocomplete="off" aria-label="URL">
+        <button id="send" class="btn btn-primary">Send</button>
+      </div>
+    </div>
+
+    <nav class="tabs" data-group="req">
+      <button class="tab active" data-pane="params">Parameters <span class="badge" id="c-params"></span></button>
+      <button class="tab" data-pane="body">Body <span class="dot" id="c-body"></span></button>
+      <button class="tab" data-pane="headers">Headers <span class="badge" id="c-headers"></span></button>
+      <button class="tab" data-pane="auth">Authorization <span class="dot" id="c-auth"></span></button>
+      <button class="tab" data-pane="cookies">Cookies <span class="badge" id="c-cookies"></span></button>
+    </nav>
+
+    <div class="panes" data-group="req">
+      <div class="pane active" id="pane-params">
+        <div class="bar"><span class="label">Query Parameters</span><span class="spacer"></span>
+          <button class="btn icon" data-clear="params" title="Clear all"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>
+        </div>
+        <table class="kv" id="kv-params"></table>
+      </div>
+      <div class="pane" id="pane-body">
+        <div class="bar">
+          <span class="label">Content Type</span>
+          <select id="btype" class="native" aria-label="Content type">
+            <option value="none">None</option>
+            <option value="json">application/json</option>
+            <option value="text">text/plain</option>
+          </select>
+          <span class="spacer"></span>
+          <span class="msg" id="body-msg"></span>
+          <button class="btn icon" id="fmt" title="Prettify JSON"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h13"/></svg></button>
+        </div>
+        <div class="editor">
+          <div class="gutter" id="gutter">1</div>
+          <div class="code-wrap">
+            <pre class="hl" id="body-hl" aria-hidden="true"></pre>
+            <textarea id="body" spellcheck="false" placeholder='{ "name": "value" }' aria-label="Request body"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="pane" id="pane-headers">
+        <div class="bar"><span class="label">Header List</span><span class="spacer"></span>
+          <button class="btn icon" data-clear="headers" title="Clear all"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>
+        </div>
+        <table class="kv" id="kv-headers"></table>
+      </div>
+      <div class="pane" id="pane-auth">
+        <div class="bar"><span class="label">Authorization Type</span><span style="color:var(--secondary-dark-color);font-weight:600;padding:0 8px">Bearer Token</span></div>
+        <div class="form">
+          <label for="token">Token</label>
+          <input id="token" class="textbox" type="text" placeholder="eyJhbGciOi…" spellcheck="false" autocomplete="off">
+          <span class="msg">Sent as <code>Authorization: Bearer &lt;token&gt;</code>. Leave empty for no auth.</span>
+        </div>
+      </div>
+      <div class="pane" id="pane-cookies">
+        <div class="bar"><span class="label">Cookies</span><span class="spacer"></span>
+          <button class="btn icon" data-clear="cookies" title="Clear all"><svg class="i" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>
+        </div>
+        <table class="kv" id="kv-cookies"></table>
+        <div class="note">Combined into a single <code>Cookie</code> header. Rows here override cookies with the same name from the cookie jar.</div>
+        <div class="jar-note" id="jar-note"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="response">
+    <div class="status" id="meta"></div>
+    <nav class="tabs" data-group="resp" id="resp-tabs" hidden>
+      <button class="tab active" data-pane="rbody">Response Body</button>
+      <button class="tab" data-pane="rheaders">Headers <span class="badge" id="c-rheaders"></span></button>
+      <button class="tab" data-pane="rcookies">Cookies <span class="badge" id="c-rcookies"></span></button>
+      <div class="resp-actions">
+        <button class="btn" id="copy-resp" title="Copy response body"><svg class="i" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg><span>Copy</span></button>
+        <button class="btn icon" id="dl-resp" title="Download response body"><svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
+      </div>
+    </nav>
+    <div class="panes" data-group="resp">
+      <div class="pane active" id="pane-rbody">
+        <div class="empty">
+          <svg class="i big" viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          <div class="shortcuts">
+            <span>Send Request</span><span><kbd>Ctrl</kbd><kbd>↵</kbd></span>
+            <span>Send from URL bar</span><span><kbd>↵</kbd></span>
+          </div>
+        </div>
+      </div>
+      <div class="pane" id="pane-rheaders"></div>
+      <div class="pane" id="pane-rcookies"></div>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="jar-modal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="jar-title">
+    <div class="modal-head">
+      <svg class="i" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9.5-9 3 3 0 0 0 3.5 3.5 3 3 0 0 0 3 3 3 3 0 0 0 3 2.5z"/><path d="M8.5 9.5h.01M12 15h.01M15.5 12.5h.01M8 14.5h.01"/></svg>
+      <h2 id="jar-title">Cookie jar</h2>
+      <button class="btn" id="jar-clear">Clear all</button>
+      <button class="btn icon" id="jar-close" title="Close" aria-label="Close"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="modal-sub">
+      <label class="switch"><input type="checkbox" id="jar-on"> Send stored cookies automatically</label>
+      <span class="msg">Cookies from <code>Set-Cookie</code> responses are saved here and sent with matching requests from every tab.</span>
+    </div>
+    <div class="modal-body" id="jar-list"></div>
+  </div>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const STORE = 'webman:v1';
+const ICON_CHECK = '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>';
+const ICON_TRASH = '<svg class="i" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>';
+
+// ---------- Tabs ----------
+document.querySelectorAll('nav.tabs').forEach((nav) => {
+  nav.addEventListener('click', (e) => {
+    const btn = e.target.closest('.tab');
+    if (!btn) return;
+    nav.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t === btn));
+    const panes = document.querySelector(`.panes[data-group="${nav.dataset.group}"]`);
+    panes.querySelectorAll(':scope > .pane').forEach((p) => p.classList.toggle('active', p.id === 'pane-' + btn.dataset.pane));
+    if (nav.dataset.group === 'req' && typeof activeTab === 'function' && activeTab()) activeTab().reqPane = btn.dataset.pane;
+  });
+});
+
+// ---------- Key/value tables ----------
+function makeKV(tableId, keyPh, valPh, onChange) {
+  const table = document.getElementById(tableId);
+  const isOn = (tr) => !tr.classList.contains('off');
+  const api = {
+    rows() {
+      return [...table.rows].map((tr) => ({ on: isOn(tr), key: tr.querySelector('.k').value, value: tr.querySelector('.v').value }))
+        .filter((r) => r.key || r.value);
+    },
+    active() { return api.rows().filter((r) => r.on && r.key.trim()); },
+    set(rows) { table.innerHTML = ''; rows.forEach(addRow); addRow(); },
+  };
+  function refreshBlank(tr) { tr.classList.toggle('blank', !tr.querySelector('.k').value && !tr.querySelector('.v').value); }
+  function addRow(r = { on: true, key: '', value: '' }) {
+    const tr = table.insertRow();
+    tr.innerHTML = `<td><input type="text" class="k" placeholder="${keyPh}" spellcheck="false"></td>
+      <td><input type="text" class="v" placeholder="${valPh}" spellcheck="false"></td>
+      <td class="tog"><button class="btn icon" title="Turn on/off" tabindex="-1">${ICON_CHECK}</button></td>
+      <td class="del"><button class="btn icon" title="Remove" tabindex="-1">${ICON_TRASH}</button></td>`;
+    tr.querySelector('.k').value = r.key;
+    tr.querySelector('.v').value = r.value;
+    tr.classList.toggle('off', !r.on);
+    refreshBlank(tr);
+  }
+  table.addEventListener('input', (e) => {
+    const tr = e.target.closest('tr');
+    refreshBlank(tr);
+    if (tr === table.rows[table.rows.length - 1] && !tr.classList.contains('blank')) addRow();
+    onChange();
+  });
+  table.addEventListener('click', (e) => {
+    const tr = e.target.closest('tr');
+    if (e.target.closest('.tog button')) { tr.classList.toggle('off'); onChange(); return; }
+    if (!e.target.closest('.del button')) return;
+    if (tr !== table.rows[table.rows.length - 1]) tr.remove();
+    else { tr.querySelectorAll('input').forEach((i) => (i.value = '')); refreshBlank(tr); }
+    onChange();
+  });
+  return api;
+}
+
+const params = makeKV('kv-params', 'Parameter', 'Value', () => { syncUrlFromParams(); changed(); });
+const headers = makeKV('kv-headers', 'Header', 'Value', changed);
+const cookies = makeKV('kv-cookies', 'Cookie name', 'Value', changed);
+const kvs = { params, headers, cookies };
+document.querySelectorAll('[data-clear]').forEach((b) => b.addEventListener('click', () => {
+  kvs[b.dataset.clear].set([]);
+  if (b.dataset.clear === 'params') syncUrlFromParams();
+  changed();
+}));
+
+// ---------- URL <-> params sync ----------
+const urlEl = $('#url');
+function splitUrl(u) { const i = u.indexOf('?'); return i < 0 ? [u, ''] : [u.slice(0, i), u.slice(i + 1)]; }
+function dec(s) { try { return decodeURIComponent(s.replace(/\+/g, ' ')); } catch { return s; } }
+function syncParamsFromUrl() {
+  const [, q] = splitUrl(urlEl.value);
+  const disabled = params.rows().filter((r) => !r.on);
+  const rows = q ? q.split('&').filter(Boolean).map((p) => {
+    const i = p.indexOf('=');
+    return { on: true, key: dec(i < 0 ? p : p.slice(0, i)), value: i < 0 ? '' : dec(p.slice(i + 1)) };
+  }) : [];
+  params.set([...rows, ...disabled]);
+}
+function syncUrlFromParams() {
+  const [base] = splitUrl(urlEl.value);
+  const q = params.active().map((r) => encodeURIComponent(r.key) + (r.value !== '' ? '=' + encodeURIComponent(r.value) : '')).join('&');
+  urlEl.value = q ? `${base}?${q}` : base;
+}
+urlEl.addEventListener('input', () => { syncParamsFromUrl(); changed(); });
+
+// ---------- Body ----------
+const bodyEl = $('#body');
+const bodyMsg = $('#body-msg');
+const btypeEl = $('#btype');
+const bodyType = () => btypeEl.value;
+function updateGutter() {
+  const n = bodyEl.value.split('\n').length;
+  $('#gutter').textContent = Array.from({ length: n }, (_, i) => i + 1).join('\n');
+  paintBody();
+}
+// Colour the JSON body the same way as the response viewer.
+function paintBody() {
+  const hl = $('#body-hl');
+  const json = bodyType() === 'json' && bodyEl.value !== '';
+  bodyEl.classList.toggle('colored', json);
+  // trailing space keeps the last empty line the same height as in the textarea
+  hl.innerHTML = json ? highlightJson(bodyEl.value) + ' ' : '';
+  syncBodyScroll();
+}
+function syncBodyScroll() {
+  const hl = $('#body-hl');
+  hl.scrollTop = bodyEl.scrollTop; hl.scrollLeft = bodyEl.scrollLeft;
+  $('#gutter').style.transform = `translateY(${-bodyEl.scrollTop}px)`;
+}
+function validateBody() {
+  bodyMsg.textContent = ''; bodyMsg.className = 'msg';
+  bodyEl.disabled = bodyType() === 'none';
+  $('#fmt').style.display = bodyType() === 'json' ? '' : 'none';
+  if (bodyType() === 'json' && bodyEl.value.trim()) {
+    try { JSON.parse(bodyEl.value); bodyMsg.textContent = 'Valid JSON'; bodyMsg.className = 'msg ok'; }
+    catch (e) { bodyMsg.textContent = e.message; bodyMsg.className = 'msg err'; return false; }
+  }
+  return true;
+}
+btypeEl.addEventListener('change', () => { validateBody(); paintBody(); changed(); });
+bodyEl.addEventListener('input', () => { updateGutter(); validateBody(); changed(); });
+bodyEl.addEventListener('scroll', syncBodyScroll);
+bodyEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Tab') { e.preventDefault(); bodyEl.setRangeText('  ', bodyEl.selectionStart, bodyEl.selectionEnd, 'end'); updateGutter(); }
+});
+$('#fmt').addEventListener('click', () => {
+  try { bodyEl.value = JSON.stringify(JSON.parse(bodyEl.value), null, 2); updateGutter(); validateBody(); changed(); } catch { validateBody(); }
+});
+$('#token').addEventListener('input', changed);
+const paintMethod = () => ($('#method').dataset.m = $('#method').value);
+$('#method').addEventListener('change', () => { paintMethod(); changed(); });
+
+// ---------- Custom dropdown (wraps a hidden native <select>) ----------
+const CHEV = '<svg class="i chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>';
+const TICK = '<svg class="i tick" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg>';
+const dropdowns = [];
+function enhanceSelect(sel, { colorByMethod = false } = {}) {
+  const btn = document.createElement('button');
+  btn.type = 'button'; btn.className = 'dd-btn';
+  btn.setAttribute('aria-haspopup', 'listbox'); btn.setAttribute('aria-expanded', 'false');
+  btn.setAttribute('aria-label', sel.getAttribute('aria-label') || '');
+  const menu = document.createElement('div');
+  menu.className = 'dd-menu'; menu.setAttribute('role', 'listbox'); menu.hidden = true;
+  menu.innerHTML = [...sel.options].map((o) =>
+    `<button type="button" class="dd-item" role="option" data-value="${o.value}"${colorByMethod ? ` data-m="${o.value}"` : ''}>${o.text}${TICK}</button>`).join('');
+  sel.after(btn);
+  document.body.appendChild(menu);
+  const items = [...menu.children];
+  let hl = -1;
+
+  function sync() {
+    const o = sel.options[sel.selectedIndex];
+    btn.innerHTML = `<span>${o ? o.text : ''}</span>${CHEV}`;
+    if (colorByMethod) btn.dataset.m = sel.value;
+    items.forEach((it) => it.setAttribute('aria-selected', String(it.dataset.value === sel.value)));
+  }
+  function highlight(i) { hl = (i + items.length) % items.length; items.forEach((it, j) => it.classList.toggle('hl', j === hl)); items[hl].scrollIntoView({ block: 'nearest' }); }
+  function place() {
+    const r = btn.getBoundingClientRect();
+    menu.style.minWidth = Math.max(160, r.width) + 'px';
+    const below = window.innerHeight - r.bottom;
+    menu.style.left = Math.min(r.left, window.innerWidth - menu.offsetWidth - 8) + 'px';
+    menu.style.top = (below < menu.offsetHeight + 8 && r.top > below ? r.top - menu.offsetHeight - 4 : r.bottom + 4) + 'px';
+  }
+  function open() {
+    dropdowns.forEach((d) => d !== api && d.close());
+    menu.hidden = false; btn.setAttribute('aria-expanded', 'true'); place();
+    highlight(Math.max(0, sel.selectedIndex));
+  }
+  function close(focus) { if (menu.hidden) return; menu.hidden = true; btn.setAttribute('aria-expanded', 'false'); if (focus) btn.focus(); }
+  function choose(value) {
+    close(true);
+    if (sel.value === value) return;
+    sel.value = value; sync();
+    sel.dispatchEvent(new Event('change'));
+  }
+  btn.addEventListener('click', () => (menu.hidden ? open() : close()));
+  btn.addEventListener('keydown', (e) => {
+    if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key) && menu.hidden) { e.preventDefault(); open(); return; }
+    if (menu.hidden) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); highlight(hl + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); highlight(hl - 1); }
+    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); choose(items[hl].dataset.value); }
+    else if (e.key === 'Escape' || e.key === 'Tab') close(e.key === 'Escape');
+  });
+  menu.addEventListener('click', (e) => { const it = e.target.closest('.dd-item'); if (it) choose(it.dataset.value); });
+  menu.addEventListener('mousemove', (e) => { const i = items.indexOf(e.target.closest('.dd-item')); if (i >= 0 && i !== hl) highlight(i); });
+  const api = { btn, menu, sync, close };
+  dropdowns.push(api);
+  sync();
+  return api;
+}
+document.addEventListener('mousedown', (e) => {
+  dropdowns.forEach((d) => { if (!d.menu.contains(e.target) && !d.btn.contains(e.target)) d.close(); });
+});
+window.addEventListener('resize', () => dropdowns.forEach((d) => d.close()));
+document.addEventListener('scroll', (e) => { if (!e.target.closest || !e.target.closest('.dd-menu')) dropdowns.forEach((d) => d.close()); }, true);
+enhanceSelect($('#method'), { colorByMethod: true });
+enhanceSelect(btypeEl);
+
+// ---------- Request tabs: state + persistence ----------
+const STORE_TABS = 'webman:v2';
+const RESP_KEY = (id) => 'webman:resp:' + id;
+const EMPTY_RESP = $('#pane-rbody').innerHTML;
+const ICON_X = '<svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+let tabs = [];
+let activeId = null;
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+const activeTab = () => tabs.find((t) => t.id === activeId);
+function newTab(init = {}) {
+  return { id: uid(), method: 'GET', url: '', params: [], headers: [], cookies: [], token: '', bodyType: 'none', body: '',
+    reqPane: 'params', response: null, sending: false, ...init };
+}
+function readEditor() {
+  return { method: $('#method').value, url: urlEl.value, params: params.rows(), headers: headers.rows(),
+    cookies: cookies.rows(), token: $('#token').value, bodyType: bodyType(), body: bodyEl.value };
+}
+function persist() {
+  try {
+    const slim = tabs.map(({ response, sending, ...t }) => t);
+    localStorage.setItem(STORE_TABS, JSON.stringify({ tabs: slim, activeId }));
+  } catch {}
+}
+function saveResponse(tab) {
+  try {
+    if (tab.response && JSON.stringify(tab.response).length < 1_500_000) localStorage.setItem(RESP_KEY(tab.id), JSON.stringify(tab.response));
+    else localStorage.removeItem(RESP_KEY(tab.id));
+  } catch {}
+}
+
+// Called whenever the editor changes: refresh badges, copy into the active tab, save.
+function changed() {
+  const set = (id, n) => ($(id).textContent = n ? n : '');
+  set('#c-params', params.active().length);
+  set('#c-headers', headers.active().length);
+  set('#c-cookies', cookies.active().length);
+  $('#c-auth').classList.toggle('on', !!$('#token').value.trim());
+  $('#c-body').classList.toggle('on', bodyType() !== 'none' && !!bodyEl.value.trim());
+  renderJarNote();
+  const t = activeTab();
+  if (!t) return;
+  Object.assign(t, readEditor());
+  renderTabBar();
+  persist();
+}
+
+// Put a tab's saved request + response into the editor.
+function loadTab(t) {
+  $('#method').value = t.method || 'GET';
+  paintMethod();
+  urlEl.value = t.url || '';
+  params.set(t.params || []);
+  headers.set(t.headers || []);
+  cookies.set(t.cookies || []);
+  $('#token').value = t.token || '';
+  bodyEl.value = t.body || '';
+  bodyEl.scrollTop = 0; $('#gutter').style.transform = '';
+  btypeEl.value = ['none', 'json', 'text'].includes(t.bodyType) ? t.bodyType : 'none';
+  dropdowns.forEach((d) => { d.close(); d.sync(); });
+  updateGutter(); validateBody();
+  const pane = document.querySelector(`nav[data-group=req] .tab[data-pane="${t.reqPane || 'params'}"]`);
+  if (pane) pane.click();
+  renderResponse(t);
+  paintSendButton(t);
+  changed();
+}
+
+function tabLabel(t) {
+  const u = (t.url || '').trim().replace(/^https?:\/\//i, '').split(/[?#]/)[0].replace(/\/$/, '');
+  return u || 'Untitled';
+}
+function renderTabBar() {
+  const list = $('#reqtabs');
+  list.innerHTML = tabs.map((t) => `
+    <div class="rtab${t.id === activeId ? ' active' : ''}" role="tab" tabindex="0" data-id="${t.id}"
+         aria-selected="${t.id === activeId}" title="${esc(t.method + ' ' + (t.url || 'Untitled'))}">
+      ${t.sending ? '<span class="spinner"></span>' : ''}
+      <span class="m" data-m="${esc(t.method)}">${esc(t.method)}</span>
+      <span class="name">${esc(tabLabel(t))}</span>
+      <button class="x" title="Close tab" aria-label="Close tab" tabindex="-1">${ICON_X}</button>
+    </div>`).join('');
+}
+function switchTab(id) {
+  if (!tabs.some((t) => t.id === id)) return;
+  activeId = id;
+  loadTab(activeTab());
+  const el = document.querySelector(`.rtab[data-id="${id}"]`);
+  if (el) el.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+}
+function addTab(init) {
+  const t = newTab(init);
+  const i = tabs.findIndex((x) => x.id === activeId);
+  tabs.splice(i + 1, 0, t);
+  switchTab(t.id);
+  urlEl.focus();
+}
+function closeTab(id) {
+  const i = tabs.findIndex((t) => t.id === id);
+  if (i < 0) return;
+  try { localStorage.removeItem(RESP_KEY(id)); } catch {}
+  tabs.splice(i, 1);
+  if (!tabs.length) tabs.push(newTab());
+  if (id === activeId) switchTab(tabs[Math.min(i, tabs.length - 1)].id);
+  else { renderTabBar(); persist(); }
+}
+
+$('#addtab').addEventListener('click', () => addTab());
+$('#tabfill').addEventListener('dblclick', () => addTab());
+$('#reqtabs').addEventListener('click', (e) => {
+  const el = e.target.closest('.rtab');
+  if (!el) return;
+  if (e.target.closest('.x')) closeTab(el.dataset.id);
+  else if (el.dataset.id !== activeId) switchTab(el.dataset.id);
+});
+$('#reqtabs').addEventListener('auxclick', (e) => {   // middle-click closes, like a browser
+  const el = e.target.closest('.rtab');
+  if (el && e.button === 1) { e.preventDefault(); closeTab(el.dataset.id); }
+});
+$('#reqtabs').addEventListener('mousedown', (e) => { if (e.button === 1) e.preventDefault(); });
+$('#reqtabs').addEventListener('keydown', (e) => {
+  const el = e.target.closest('.rtab');
+  if (!el) return;
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); switchTab(el.dataset.id); }
+  if (e.key === 'Delete') { e.preventDefault(); closeTab(el.dataset.id); }
+});
+// Alt+N new tab, Alt+W close tab, Alt+←/→ previous/next (Ctrl+T/W belong to the browser)
+document.addEventListener('keydown', (e) => {
+  if (!e.altKey || e.ctrlKey || e.metaKey) return;
+  const k = e.key.toLowerCase();
+  if (k === 'n') { e.preventDefault(); addTab(); }
+  else if (k === 'w') { e.preventDefault(); closeTab(activeId); }
+  else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+    e.preventDefault();
+    const i = tabs.findIndex((t) => t.id === activeId);
+    switchTab(tabs[(i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length].id);
+  }
+});
+
+function loadAll() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(STORE_TABS)); } catch {}
+  if (saved && Array.isArray(saved.tabs) && saved.tabs.length) {
+    tabs = saved.tabs.map((t) => {
+      let response = null;
+      try { response = JSON.parse(localStorage.getItem(RESP_KEY(t.id))); } catch {}
+      return newTab({ ...t, response, sending: false });
+    });
+    activeId = tabs.some((t) => t.id === saved.activeId) ? saved.activeId : tabs[0].id;
+  } else {
+    let old = null;   // migrate the single request saved by earlier versions
+    try { old = JSON.parse(localStorage.getItem(STORE)); } catch {}
+    tabs = [newTab(old || {})];
+    activeId = tabs[0].id;
+  }
+  switchTab(activeId);
+}
+
+// ---------- Cookie jar (shared by every request tab, and by other browser tabs via localStorage) ----------
+const JAR_KEY = 'webman:jar';
+const JAR_ON_KEY = 'webman:jar:on';
+let jar = [];
+let jarOn = true;
+const isLocalHost = (h) => h === 'localhost' || h === '127.0.0.1' || h === '[::1]' || h.endsWith('.localhost');
+const domainMatch = (host, d) => (host = host.toLowerCase()) === d || host.endsWith('.' + d);
+const pathMatch = (rp, cp) => rp === cp || (rp.startsWith(cp) && (cp.endsWith('/') || rp[cp.length] === '/'));
+function defaultPath(p) {
+  if (!p.startsWith('/') || p === '/') return '/';
+  const i = p.lastIndexOf('/');
+  return i === 0 ? '/' : p.slice(0, i);
+}
+function parseSetCookie(str, reqUrl) {
+  let u; try { u = new URL(reqUrl); } catch { return null; }
+  const [pair, ...attrs] = str.split(';');
+  const i = pair.indexOf('=');
+  if (i < 1) return null;
+  const c = { name: pair.slice(0, i).trim(), value: pair.slice(i + 1).trim(), domain: u.hostname.toLowerCase(), hostOnly: true,
+    path: defaultPath(u.pathname), expires: null, secure: false, httpOnly: false, sameSite: '' };
+  let hasMaxAge = false;
+  for (const a of attrs) {
+    const j = a.indexOf('=');
+    const k = (j < 0 ? a : a.slice(0, j)).trim().toLowerCase();
+    const v = j < 0 ? '' : a.slice(j + 1).trim();
+    if (k === 'domain' && v) {
+      const d = v.replace(/^\./, '').toLowerCase();
+      if (!domainMatch(u.hostname, d)) return null;          // server may not set cookies for another domain
+      c.domain = d; c.hostOnly = false;
+    } else if (k === 'path') c.path = v.startsWith('/') ? v : defaultPath(u.pathname);
+    else if (k === 'max-age') { const n = parseInt(v, 10); if (!isNaN(n)) { c.expires = Date.now() + n * 1000; hasMaxAge = true; } }
+    else if (k === 'expires' && !hasMaxAge) { const t = Date.parse(v); if (!isNaN(t)) c.expires = t; }
+    else if (k === 'secure') c.secure = true;
+    else if (k === 'httponly') c.httpOnly = true;
+    else if (k === 'samesite') c.sameSite = v;
+  }
+  return c;
+}
+function loadJar() {
+  try { jar = JSON.parse(localStorage.getItem(JAR_KEY)) || []; } catch { jar = []; }
+  try { jarOn = localStorage.getItem(JAR_ON_KEY) !== 'off'; } catch { jarOn = true; }
+}
+function saveJar() {
+  try { localStorage.setItem(JAR_KEY, JSON.stringify(jar)); localStorage.setItem(JAR_ON_KEY, jarOn ? 'on' : 'off'); } catch {}
+}
+function pruneJar() {
+  const now = Date.now();
+  const before = jar.length;
+  jar = jar.filter((c) => c.expires == null || c.expires > now);
+  return jar.length !== before;
+}
+function storeCookies(list) {
+  for (const { url, cookie } of list || []) {
+    const c = parseSetCookie(cookie, url);
+    if (!c) continue;
+    jar = jar.filter((x) => !(x.name === c.name && x.domain === c.domain && x.path === c.path));
+    if (c.expires != null && c.expires <= Date.now()) continue;   // expired / Max-Age=0 means "delete"
+    jar.push(c);
+  }
+  saveJar(); renderJar();
+}
+function jarCookiesFor(urlStr) {
+  if (pruneJar()) saveJar();
+  let u; try { u = new URL(urlStr); } catch { return []; }
+  const host = u.hostname.toLowerCase();
+  return jar.filter((c) => (c.hostOnly ? host === c.domain : domainMatch(host, c.domain))
+      && pathMatch(u.pathname || '/', c.path)
+      && (!c.secure || u.protocol === 'https:' || isLocalHost(host)))
+    .sort((a, b) => b.path.length - a.path.length);
+}
+function normalizedUrl() {
+  const url = urlEl.value.trim();
+  return url && !/^https?:\/\//i.test(url) ? 'http://' + url : url;
+}
+function renderJarNote() {
+  const note = $('#jar-note');
+  if (!note) return;
+  const list = jarOn ? jarCookiesFor(normalizedUrl()) : [];
+  if (!jarOn) note.innerHTML = `Cookie jar is off. <a data-open-jar>Turn on</a>`;
+  else if (!list.length) note.innerHTML = jar.length ? `No saved cookies match this URL. <a data-open-jar>View cookie jar</a>` : '';
+  else note.innerHTML = `Also sending from the cookie jar: <b>${list.map((c) => esc(c.name)).join(', ')}</b> · <a data-open-jar>Manage</a>`;
+}
+function fmtExpiry(c) {
+  if (c.expires == null) return 'Session';
+  const d = new Date(c.expires);
+  return 'Expires ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+function renderJar() {
+  pruneJar();
+  $('#jarcount').textContent = jar.length || '';
+  $('#jar-on').checked = jarOn;
+  const byDomain = {};
+  jar.forEach((c, i) => (byDomain[c.domain] ||= []).push([c, i]));
+  const domains = Object.keys(byDomain).sort();
+  $('#jar-list').innerHTML = domains.length ? domains.map((d) => `
+    <div class="jar-domain">${esc(d)}</div>
+    <table class="jar">${byDomain[d].map(([c, i]) => `
+      <tr><td class="n" title="${esc(c.name)}">${esc(c.name)}</td>
+        <td class="v" title="${esc(c.value)}">${esc(c.value)}</td>
+        <td class="a" title="${esc([c.path, c.secure && 'Secure', c.httpOnly && 'HttpOnly', c.sameSite && 'SameSite=' + c.sameSite].filter(Boolean).join('; '))}">${esc(c.path)} · ${esc(fmtExpiry(c))}</td>
+        <td class="d"><button class="btn icon" data-del="${i}" title="Delete cookie">${ICON_TRASH}</button></td></tr>`).join('')}
+    </table>`).join('')
+    : `<div class="empty">No cookies yet. Cookies from <code>Set-Cookie</code> responses (like a login) will show up here.</div>`;
+  renderJarNote();
+}
+function openJar() { renderJar(); $('#jar-modal').hidden = false; $('#jar-close').focus(); }
+function closeJar() { $('#jar-modal').hidden = true; }
+$('#jarbtn').addEventListener('click', openJar);
+$('#jar-close').addEventListener('click', closeJar);
+$('#jar-modal').addEventListener('mousedown', (e) => { if (e.target.id === 'jar-modal') closeJar(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#jar-modal').hidden) closeJar(); });
+$('#jar-clear').addEventListener('click', () => { if (!jar.length || confirm('Delete all saved cookies?')) { jar = []; saveJar(); renderJar(); } });
+$('#jar-on').addEventListener('change', (e) => { jarOn = e.target.checked; saveJar(); renderJar(); });
+$('#jar-list').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-del]');
+  if (b) { jar.splice(Number(b.dataset.del), 1); saveJar(); renderJar(); }
+});
+document.addEventListener('click', (e) => { if (e.target.closest('[data-open-jar]')) openJar(); });
+window.addEventListener('storage', (e) => { if (e.key === JAR_KEY || e.key === JAR_ON_KEY) { loadJar(); renderJar(); } });
+loadJar();
+
+// ---------- Send ----------
+function buildRequest() {
+  let url = urlEl.value.trim();
+  if (url && !/^https?:\/\//i.test(url)) url = 'http://' + url;
+  const h = {};
+  const hasHeader = (name) => Object.keys(h).some((k) => k.toLowerCase() === name);
+  headers.active().forEach((r) => (h[r.key.trim()] = r.value));
+  const token = $('#token').value.trim();
+  if (token && !hasHeader('authorization')) h['Authorization'] = 'Bearer ' + token;
+  // Cookie header = jar cookies, then a Cookie header typed in Headers, then the Cookies tab (later wins by name).
+  const merged = new Map();
+  if (jarOn) jarCookiesFor(url).forEach((c) => { if (!merged.has(c.name)) merged.set(c.name, c.value); });
+  const existing = Object.keys(h).find((k) => k.toLowerCase() === 'cookie');
+  if (existing) {
+    h[existing].split(';').map((p) => p.trim()).filter(Boolean).forEach((p) => {
+      const i = p.indexOf('=');
+      merged.set(i < 0 ? p : p.slice(0, i).trim(), i < 0 ? '' : p.slice(i + 1));
+    });
+    delete h[existing];
+  }
+  cookies.active().forEach((r) => merged.set(r.key.trim(), r.value));
+  if (merged.size) h['Cookie'] = [...merged].map(([k, v]) => `${k}=${v}`).join('; ');
+  let body = null;
+  const bt = bodyType();
+  if (bt !== 'none' && bodyEl.value !== '') {
+    body = bodyEl.value;
+    if (!hasHeader('content-type')) h['Content-Type'] = bt === 'json' ? 'application/json' : 'text/plain; charset=utf-8';
+  }
+  return { method: $('#method').value, url, headers: h, body };
+}
+
+function paintSendButton(t) {
+  const btn = $('#send');
+  btn.disabled = !!t.sending;
+  if (t.sending) btn.innerHTML = '<span class="spinner"></span>'; else btn.textContent = 'Send';
+}
+async function send() {
+  const tab = activeTab();
+  if (!tab || tab.sending) return;
+  if (!urlEl.value.trim()) { urlEl.focus(); return; }
+  if (bodyType() === 'json' && !validateBody() && !confirm('Body is not valid JSON. Send anyway?')) return;
+  const req = buildRequest();
+  tab.sending = true; paintSendButton(tab); renderTabBar();
+  try {
+    const r = await fetch('/api/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(req) });
+    tab.response = await r.json();
+    if (tab.response.setCookies) storeCookies(tab.response.setCookies);
+  } catch (e) {
+    tab.response = { error: 'Could not reach the Localwomen server: ' + e.message };
+  } finally {
+    tab.sending = false;
+  }
+  if (!tabs.includes(tab)) return;          // tab was closed while waiting
+  saveResponse(tab);
+  renderTabBar();
+  if (tab.id === activeId) { paintSendButton(tab); renderResponse(tab); }
+}
+$('#send').addEventListener('click', send);
+document.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); send(); } });
+urlEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') send(); });
+
+// ---------- Response rendering ----------
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function highlightJson(str) {
+  return esc(str).replace(/(&quot;(\\u[\da-fA-F]{4}|\\[^u]|(?!&quot;)[^\\])*&quot;(\s*:)?|\b(true|false)\b|\bnull\b|-?\d+(\.\d+)?([eE][+-]?\d+)?)/g, (m) => {
+    let cls = 'j-num';
+    if (m.startsWith('&quot;')) cls = m.trimEnd().endsWith(':') ? 'j-key' : 'j-str';
+    else if (m === 'true' || m === 'false') cls = 'j-bool';
+    else if (m === 'null') cls = 'j-null';
+    return `<span class="${cls}">${m}</span>`;
+  });
+}
+function fmtSize(n) { return n < 1024 ? n + ' B' : n < 1048576 ? (n / 1024).toFixed(2) + ' KB' : (n / 1048576).toFixed(2) + ' MB'; }
+function listTable(rows) {
+  if (!rows.length) return '<div class="empty">Nothing here</div>';
+  return '<table class="list">' + rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('') + '</table>';
+}
+function renderResponse(t) {
+  const d = t.response;
+  if (!d) {
+    $('#meta').innerHTML = '';
+    $('#resp-tabs').hidden = true;
+    document.querySelector('#resp-tabs .tab').click();
+    $('#pane-rbody').innerHTML = EMPTY_RESP;
+    $('#pane-rheaders').innerHTML = ''; $('#pane-rcookies').innerHTML = '';
+    return;
+  }
+  if (d.error) showError(d); else showResponse(d);
+}
+function showResponse(d) {
+  const cls = 's' + String(d.status)[0];
+  $('#meta').innerHTML = `<span><span class="k">Status:</span><span class="${cls}">${d.status}${d.statusText ? ' • ' + esc(d.statusText) : ''}</span></span>
+    <span><span class="k">Time:</span><span class="${cls}">${d.timeMs} ms</span></span>
+    <span><span class="k">Size:</span><span class="${cls}">${fmtSize(d.size)}</span></span>`;
+  $('#resp-tabs').hidden = false;
+  let html;
+  try { html = highlightJson(JSON.stringify(JSON.parse(d.body), null, 2)); } catch { html = esc(d.body); }
+  $('#pane-rbody').innerHTML = d.body ? `<pre class="out">${html}</pre>` : '<div class="empty">Empty response body</div>';
+  $('#pane-rheaders').innerHTML = listTable(d.headers);
+  $('#c-rheaders').textContent = d.headers.length || '';
+  const ck = (d.setCookies ? d.setCookies.map((s) => s.cookie) : d.cookies).map((c) => {
+    const [pair, ...attrs] = c.split(';');
+    const i = pair.indexOf('=');
+    return [pair.slice(0, i).trim(), pair.slice(i + 1) + (attrs.length ? '  ·  ' + attrs.join(';').trim() : '')];
+  });
+  $('#pane-rcookies').innerHTML = listTable(ck);
+  $('#c-rcookies').textContent = ck.length || '';
+}
+function showError(d) {
+  $('#meta').innerHTML = `<span><span class="k">Status:</span><span class="serr">Error</span></span>` +
+    (d.timeMs != null ? `<span><span class="k">Time:</span><span class="serr">${d.timeMs} ms</span></span>` : '');
+  $('#resp-tabs').hidden = false;
+  document.querySelector('#resp-tabs .tab').click();
+  $('#pane-rbody').innerHTML = `<div class="error-box">${esc(d.error)}</div>`;
+  $('#pane-rheaders').innerHTML = ''; $('#pane-rcookies').innerHTML = '';
+  $('#c-rheaders').textContent = ''; $('#c-rcookies').textContent = '';
+}
+
+// ---------- Text size ----------
+const FS_KEY = 'webman:fs';
+function setFont(px) {
+  px = Math.max(11, Math.min(26, px));
+  document.documentElement.style.setProperty('--fs', px + 'px');
+  $('#font-size').textContent = px + 'px';
+  try { localStorage.setItem(FS_KEY, String(px)); } catch {}
+  dropdowns.forEach((d) => d.close());
+}
+let fontPx = 15;
+try { fontPx = Number(localStorage.getItem(FS_KEY)) || 15; } catch {}
+$('#font-dec').addEventListener('click', () => setFont((fontPx = Math.max(11, fontPx - 1))));
+$('#font-inc').addEventListener('click', () => setFont((fontPx = Math.min(26, fontPx + 1))));
+setFont(fontPx);
+
+// ---------- Copy / download response ----------
+function responseText() {
+  const d = activeTab() && activeTab().response;
+  if (!d) return null;
+  if (d.error) return d.error;
+  try { return JSON.stringify(JSON.parse(d.body), null, 2); } catch { return d.body || ''; }
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; } catch {}
+  const ta = document.createElement('textarea');           // fallback for non-secure origins
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  let ok = false; try { ok = document.execCommand('copy'); } catch {}
+  ta.remove();
+  return ok;
+}
+$('#copy-resp').addEventListener('click', async () => {
+  const text = responseText();
+  if (text == null) return;
+  const btn = $('#copy-resp');
+  const ok = await copyText(text);
+  btn.querySelector('span').textContent = ok ? 'Copied!' : 'Copy failed';
+  btn.classList.toggle('done', ok);
+  clearTimeout(btn._t);
+  btn._t = setTimeout(() => { btn.querySelector('span').textContent = 'Copy'; btn.classList.remove('done'); }, 1500);
+});
+$('#dl-resp').addEventListener('click', () => {
+  const text = responseText();
+  if (text == null) return;
+  const d = activeTab().response;
+  let isJson = false; try { JSON.parse(d.body); isJson = true; } catch {}
+  const blob = new Blob([text], { type: isJson ? 'application/json' : 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'response' + (isJson ? '.json' : '.txt');
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+// ---------- Dark / light mode ----------
+const THEME_KEY = 'webman:theme';
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t;
+  const btn = $('#theme-btn');
+  const label = t === 'dark' ? 'Dark mode is on: switch to light mode' : 'Dark mode is off: switch to dark mode';
+  btn.title = label; btn.setAttribute('aria-label', label);
+  btn.setAttribute('aria-pressed', String(t === 'dark'));
+}
+$('#theme-btn').addEventListener('click', () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  try { localStorage.setItem(THEME_KEY, next); } catch {}
+  applyTheme(next);
+});
+// Until you pick one, follow the system setting live.
+window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+  let saved = null; try { saved = localStorage.getItem(THEME_KEY); } catch {}
+  if (!saved) applyTheme(e.matches ? 'light' : 'dark');
+});
+applyTheme(document.documentElement.dataset.theme || 'dark');
+
+loadAll();
+renderJar();
+</script>
+</body>
+</html>

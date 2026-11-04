@@ -1,0 +1,8 @@
+{
+  "name": "localwomen",
+  "version": "1.0.0",
+  "description": "Lightweight web-based HTTP client (Postman-lite), zero dependencies",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=20" }
+}

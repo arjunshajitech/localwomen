@@ -1,0 +1,8 @@
+services:
+  localwomen:
+    build: .
+    restart: always
+    ports:
+      - "127.0.0.1:3366:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
